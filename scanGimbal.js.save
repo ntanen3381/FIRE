@@ -1,12 +1,5 @@
 var noble = require('noble');
-var addressToTrack = '1fd5cbe68f13';
-var server = require('http').createServer();
-var socket = require('socket.io')(http://localhost/scanner);
-
-socket.on('connect', function(){  
-  console.log('connected to server');
-});
-
+var addressToTrack = '0a19dd286279'; 
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
         console.log('state:' + state);
@@ -51,6 +44,16 @@ function calculateDistance(rssi) {
 
 
 function sendToServer(distance, macAddress) {
+
+   var noble = require('noble');
+
+   //replace localhost with your server's IP; 
+   var socket = require('socket.io-client')('http://localhost/scanner');
+ 
+
+   socket.on('connect', function(){  
+     console.log('connected to server');
+   });
 
    noble.on('discover', function(peripheral){
        socket.emit('deviceData', {pi: 11245, GimbalId: macAddress, Distance: distance});    
