@@ -1,11 +1,23 @@
 var noble = require('noble');
 var addressToTrack = '1fd5cbe68f13';
-var server = require('http').createServer();
-var socket = require('socket.io')(http://localhost/scanner);
+var app = require('http').createServer(handler)
+var io = require('socket.io')(app);
+var fs = require('fs');
 
-socket.on('connect', function(){  
-  console.log('connected to server');
-});
+app.listen(5000);
+
+function handler (req, res) {
+  fs.readFile(__dirname + '/index.html',
+  function (err, data) {
+    if (err) {
+      res.writeHead(500);
+      return res.end('Error loading index.html');
+    }
+
+    res.writeHead(200);
+    res.end(data);
+  });
+}
 
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
@@ -14,11 +26,10 @@ noble.on('stateChange', function(state){
 });
 noble.on('scanStart', function(){
         console.log('scanStart');
-        console.log(arguments);
 });
  
 noble.on('discover', function(peripheral){
-     if(peripheral.uuid == addressToTrack){
+    // if(peripheral.uuid == addressToTrack){
          var macAddress = peripheral.uuid;
   	 var rss = peripheral.rssi;
  	 var localName = peripheral.localName; 
@@ -28,7 +39,7 @@ noble.on('discover', function(peripheral){
 	 sendToServer(distance, macAddress);	 
 	 var sleep = require('sleep');
     	 sleep.sleep(10);
-     }
+    // }
 });
 
 function calculateDistance(rssi) {
@@ -52,8 +63,9 @@ function calculateDistance(rssi) {
 
 function sendToServer(distance, macAddress) {
 
-   noble.on('discover', function(peripheral){
-       socket.emit('deviceData', {pi: 11245, GimbalId: macAddress, Distance: distance});    
+   io.on('connection', function (socket) {
+       socket.emit('news', { hello: 'world' })
+       //socket.emit('deviceData', {pi: 11245, GimbalId: macAddress, Distance: distance});    
    });
 
    noble.startScanning([], true) //allows dubplicates while scanning
