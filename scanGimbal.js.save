@@ -1,17 +1,13 @@
 var noble = require('noble');
 var addressToTrack = '1fd5cbe68f13';
-var io = require('socket.io-client');
-var socket = io.connect('http://localhost:8080', {reconnect: true});
-
-socket.on('connect', function (socket) {
-       console.log('Connection established');
-   });
+var socket = require('socket.io')('http://raspberrypi.local:5000');
 
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
         console.log('state:' + state);
         noble.startScanning([], true);
 });
+
 noble.on('scanStart', function(){
         console.log('scanStart');
 });
@@ -25,7 +21,8 @@ noble.on('discover', function(peripheral){
 	 var distance = calculateDistance(rss);
 	 console.log('Device: ', macAddress, ' Distance: ', distance);
 	 sendToServer(distance, macAddress);
-	 console.log('Sending to server');
+	 var sleep = require('sleep');
+    	 sleep.sleep(10);
     // }
 });
 
@@ -49,7 +46,21 @@ function calculateDistance(rssi) {
 
 
 function sendToServer(distance, macAddress) {
-   socket.emit('deviceData', {pi: 11245, GimbalId: macAddress, Distance: distance});
-   var sleep = require('sleep');
-   sleep.sleep(10);
+
+   socket.on('connection', function(data) {
+      socket.emit('deviceData', {pi: 11245, GimbalId: macAddress, Distance: distance});    
+   });
+   console.log(macAddress);
+   noble.startScanning([], true) //allows dubplicates while scanning
+
 }
+
+
+   process.on('uncaughtException', (err) => {
+     if( err.code === "EADDRINUSE" ) { // user-friendly message for this common error
+       console.log(`Unable to listen on port ${err.port}. The port is already in use.`);
+       process.exit(0);
+     }
+     else {
+       throw err;
+     }
