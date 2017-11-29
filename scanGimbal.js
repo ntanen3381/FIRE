@@ -1,31 +1,26 @@
 var noble = require('noble');
 var addressToTrack = '1fd5cbe68f13';
-var io = require('socket.io-client');
-var socket = io.connect('http://localhost:8080', {reconnect: true});
+var socket = require('socket.io-client')('http://django-env.mfuhrkczbq.us-east-1.elasticbeanstalk.com', {reconnect: true});
 
-socket.on('connect', function (socket) {
+socket.on('connect', function () {
        console.log('Connection established');
-   });
+});
 
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
         console.log('state:' + state);
         noble.startScanning([], true);
 });
-noble.on('scanStart', function(){
-        console.log('scanStart');
-});
+noble.startScanning([], true);
  
 noble.on('discover', function(peripheral){
     // if(peripheral.uuid == addressToTrack){
          var macAddress = peripheral.uuid;
-  	 var rss = peripheral.rssi;
- 	 var localName = peripheral.localName; 
-         console.log('found device: ', macAddress, ' ', localName, ' ', rss);
-	 var distance = calculateDistance(rss);
-	 console.log('Device: ', macAddress, ' Distance: ', distance);
+  	 var rssi = peripheral.rssi;
+ 	 var localName = peripheral.advertisement.manufacturerData 
+	 var distance = calculateDistance(rssi);
+	 console.log('Device: ', macAddress, ' Distance: ', distance, ' ', localName, ' ', rssi);
 	 sendToServer(distance, macAddress);
-	 console.log('Sending to server');
     // }
 });
 
