@@ -2,7 +2,8 @@ var noble = require('noble');
 var addressToTrack = '2b647648e384';
 var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi';
 var count = 1;
-
+var x = 1.00;
+var y = 2.00;
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
         console.log('state:' + state);
@@ -50,11 +51,13 @@ function sendToServer(distance, macAddress) {
    {
        count = 1;
    }
-   url += count + '/2.00/3.00/' + distance.toFixed(2) + '/location_form_single/';
+   url += count + '/' + x.toFixed(2) + '/' + y.toFixed(2) + '/' + distance.toFixed(2) + '/location_form_single/';
    exec('x-www-browser ' + url, function(err, stdout) {
 	sleep.sleep(10);
    });
    count += 1;
+   x += 1;
+   y += 1;
    sleep.sleep(10);
    url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi';
 }
