@@ -1,27 +1,25 @@
 var noble = require('noble');
-var addressToTrack = 'acbc32977a7c';
-var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/loction_form/beacon1/5/6/';
-
-//socket.on('connect', function () {
-  //     console.log('Connection established');
-//});
+var addressToTrack = '1b217a5b227d';
+var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/2.00/3.00/';
 
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
         console.log('state:' + state);
         noble.startScanning([], true);
 });
+
 noble.startScanning([], true);
  
 noble.on('discover', function(peripheral){
-  // if(peripheral.uuid == addressToTrack){
+   if(peripheral.uuid == addressToTrack){
          var macAddress = peripheral.uuid;
+	 var uuid = peripheral.advertisement.manufacturerData;
+	 var sleep = require('sleep');
   	 var rssi = peripheral.rssi;
- 	 var localName = peripheral.advertisement.manufacturerData 
 	 var distance = calculateDistance(rssi);
-	 console.log('Device: ', macAddress, ' Distance: ', distance, ' ', localName, ' ', rssi);
+	 console.log('Device: ', macAddress, ' Distance: ', distance, ' ', uuid, ' ', rssi);
 	 sendToServer(distance, macAddress);
-  // }
+   }
 });
 
 function calculateDistance(rssi) {
@@ -44,17 +42,14 @@ function calculateDistance(rssi) {
 
 
 function sendToServer(distance, macAddress) {
-//   socket.emit('deviceData', {pi: 11245, GimbalId: macAddress, Distance: distance});
-   url += Math.round(distance) + '/beacon2/5/4/' + Math.round(distance) + '/beacon3/4/5/' + Math.round(distance) + '/location_form_no_interface';
    var http = require('http');
-
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/html'});
-  //Return the url part of the request object:
-  res.write(url);
-  res.end();
-}).listen(8080);
-
+   var exec = require('child_process').exec;
    var sleep = require('sleep');
+   url += distance.toFixed(2) + '/location_form_single/';
+   exec('x-www-browser ' + url, function(err, stdout) {
+	sleep.sleep(10);
+   });
    sleep.sleep(10);
+   url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/2.00/3.00/';
 }
+
