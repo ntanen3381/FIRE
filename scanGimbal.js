@@ -1,9 +1,6 @@
 var noble = require('noble');
-var addressToTrack = '2b647648e384';
-var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi';
-var count = 1;
-var x = 1.00;
-var y = 2.00;
+var addressToTrack = '3ba17c55c919';
+var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/7.00/1.00/';
 noble.state = "poweredOn";
 noble.on('stateChange', function(state){
         console.log('state:' + state);
@@ -16,7 +13,6 @@ noble.on('discover', function(peripheral){
    if(peripheral.uuid == addressToTrack){
          var macAddress = peripheral.uuid;
 	 var uuid = peripheral.advertisement.manufacturerData;
-	 var sleep = require('sleep');
   	 var rssi = peripheral.rssi;
 	 var distance = calculateDistance(rssi);
 	 console.log('Device: ', macAddress, ' Distance: ', distance, ' ', uuid, ' ', rssi);
@@ -42,23 +38,14 @@ function calculateDistance(rssi) {
   }
 } 
 
-
 function sendToServer(distance, macAddress) {
    var http = require('http');
    var exec = require('child_process').exec;
    var sleep = require('sleep');
-   if (count > 3)
-   {
-       count = 1;
-   }
-   url += count + '/' + x.toFixed(2) + '/' + y.toFixed(2) + '/' + distance.toFixed(2) + '/location_form_single/';
+   url += distance.toFixed(2) + '/location_form_single/';
    exec('x-www-browser ' + url, function(err, stdout) {
 	sleep.sleep(10);
    });
-   count += 1;
-   x += 1;
-   y += 1;
    sleep.sleep(10);
-   url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi';
+   url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/7.00/1.00/';
 }
-
