@@ -15,15 +15,19 @@ noble.startScanning([], true);
 
 noble.on('discover', function(peripheral){
    	exec('date "+%S"', function(error, stdout) {
-		var packet = JSON.stringify(peripheral.advertisement.manufacturerData.toString('hex')).substr(9, 32);
-      		if(uuid == packet && stdout % 10 == 0) 
-      		{
-         		var macAddress = peripheral.uuid;
-  	 		var rssi = peripheral.rssi;
-	 		var distance = calculateDistance(rssi);
-	 		console.log('Device: ', macAddress, ' Distance: ', distance, ' ', uuid, ' ', rssi);
-	 		sendToServer(distance, macAddress);
-      		}
+		var dataPacket = "" + peripheral.advertisement.manufacturerData;
+		if (dataPacket != "undefined")
+		{
+			var packet = JSON.stringify(peripheral.advertisement.manufacturerData.toString('hex')).substr(9, 32);
+      			if(uuid == packet &&  stdout % 10 == 0) 
+      			{
+         			var macAddress = peripheral.uuid;
+  	 			var rssi = peripheral.rssi;
+	 			var distance = calculateDistance(rssi);
+	 			console.log('Device: ', macAddress, ' Distance: ', distance, ' ', uuid, ' ', rssi);
+	 			sendToServer(distance, macAddress);
+      			}
+		}
    	});
 });
 
