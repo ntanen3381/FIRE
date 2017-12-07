@@ -1,6 +1,6 @@
 var noble = require('noble');
 var uuid = 'ab6baf91449e489d9200f2e67e3d2df0';
-var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/7.00/1.00/';
+var url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/1.00/1.00/';
 var exec = require('child_process').exec;
 var http = require('http');
 var sleep = require('sleep');
@@ -41,7 +41,8 @@ var exec = require('child_process').exec;
     return Math.pow(ratio,10);
   }
   else {
-    var distance =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;    
+    var distance =  (0.89976)*Math.pow(ratio,7.7095) + 0.111;
+	distance *= 3.28;    
     return distance;
   }
 } 
@@ -50,6 +51,6 @@ function sendToServer(distance, macAddress) {
    url += distance.toFixed(2) + '/location_form_single/';
    exec('x-www-browser ' + url, function(err, stdout) {
    });
-   sleep.sleep(10);
-   url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/7.00/1.00/';
+   sleep.sleep(5);
+   url = 'http://django-env.nfjak4vxpm.us-west-2.elasticbeanstalk.com/indoor_mapping/location_form/pi1/1.00/1.00/';
 }
